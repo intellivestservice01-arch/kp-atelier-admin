@@ -1,9 +1,9 @@
 // ============================================================
 // KP ATELIER ADMIN — shared API client
-// Change API_BASE if your backend runs somewhere other than localhost:5000
+// Points at the live Render backend. Change API_BASE if you move it elsewhere.
 // ============================================================
 
-const API_BASE = "http://localhost:5000/api";
+const API_BASE = "https://kp-atelier-backend.onrender.com/api";
 
 const Auth = {
   getToken() {
@@ -100,7 +100,7 @@ function toast(message, isError = false) {
 function fullImageUrl(path) {
   if (!path) return "";
   if (path.startsWith("http")) return path;
-  return `http://localhost:5000${path}`;
+  return `https://kp-atelier-backend.onrender.com${path}`;
 }
 
 function formatMoney(amount) {

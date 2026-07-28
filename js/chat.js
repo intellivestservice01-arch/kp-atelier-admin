@@ -10,7 +10,7 @@ let allChats = [];
 let pendingImageFile = null;
 
 function initSocket() {
-  socket = io("http://localhost:5000");
+  socket = io("https://kp-atelier-backend.onrender.com");
   socket.emit("join_admin");
 
   socket.on("customer_message", ({ chatId }) => {
