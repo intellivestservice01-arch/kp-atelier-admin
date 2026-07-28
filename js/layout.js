@@ -23,7 +23,12 @@ const Layout = {
     if (!root) return;
 
     root.innerHTML = `
-      <aside class="sidebar">
+      <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Open menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+      </button>
+      <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+      <aside class="sidebar" id="sidebar">
+        <button class="mobile-menu-close" id="mobile-menu-close" aria-label="Close menu">&times;</button>
         <div class="sidebar-brand">
           <img src="assets/kp-logo.jpeg" alt="KP Atelier" />
           <div class="sidebar-brand-text">
@@ -41,6 +46,17 @@ const Layout = {
         </div>
       </aside>
     `;
+
+    const sidebar = document.getElementById("sidebar");
+    const backdrop = document.getElementById("sidebar-backdrop");
+    const openMenu = () => { sidebar.classList.add("open"); backdrop.classList.add("open"); };
+    const closeMenu = () => { sidebar.classList.remove("open"); backdrop.classList.remove("open"); };
+
+    document.getElementById("mobile-menu-btn").addEventListener("click", openMenu);
+    document.getElementById("mobile-menu-close").addEventListener("click", closeMenu);
+    backdrop.addEventListener("click", closeMenu);
+    // Tapping a nav link on mobile should close the drawer too (page navigates anyway, but feels right)
+    sidebar.addEventListener("click", (e) => { if (e.target.closest(".nav-item")) closeMenu(); });
 
     const navList = document.getElementById("nav-list");
     this.navItems.forEach((item) => {
