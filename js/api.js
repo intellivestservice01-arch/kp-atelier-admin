@@ -72,8 +72,14 @@ async function apiRequest(path, { method = "GET", body, isForm = false } = {}) {
   }
 
   if (res.status === 401) {
-    Auth.logout();
-    throw new Error("Session expired — please log in again");
+    // Only treat this as an expired session if we actually sent a token —
+    // a 401 on the login request itself just means wrong email/password,
+    // not an expired session, and shouldn't force a redirect/logout loop.
+    if (token) {
+      Auth.logout();
+      throw new Error("Session expired — please log in again");
+    }
+    throw new Error(data.error || "Invalid email or password");
   }
 
   if (!res.ok) {
