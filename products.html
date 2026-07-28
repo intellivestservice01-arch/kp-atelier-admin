@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Products — KP Atelier Admin</title>
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<div class="app-shell">
+  <div id="sidebar-root"></div>
+
+  <div class="main">
+    <div class="topbar">
+      <div>
+        <h1>Products</h1>
+        <div class="topbar-sub">Every garment, its internal reference ID, and stock status</div>
+      </div>
+      <button class="btn btn-gold" id="new-product-btn">+ New Product</button>
+    </div>
+
+    <div class="content">
+      <div class="field-row mb-16">
+        <div class="field" style="max-width:220px;">
+          <select id="filter-category">
+            <option value="">All categories</option>
+          </select>
+        </div>
+        <div class="field" style="max-width:220px;">
+          <select id="filter-status">
+            <option value="">All statuses</option>
+            <option value="available">Available</option>
+            <option value="reserved">Reserved</option>
+            <option value="sold_out">Sold out</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Image</th><th>Name</th><th>Internal ID</th><th>Category</th>
+              <th>Price</th><th>Status</th><th></th>
+            </tr>
+          </thead>
+          <tbody id="products-body">
+            <tr><td colspan="7" class="text-muted" style="padding:20px;">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Create / Edit modal -->
+<div class="modal-overlay hidden" id="product-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="modal-title">New Product</h2>
+      <button class="modal-close" id="close-modal">&times;</button>
+    </div>
+    <div class="modal-body">
+      <form id="product-form">
+        <input type="hidden" id="product-id" />
+        <div class="field">
+          <label>Product name</label>
+          <input type="text" id="p-name" required />
+        </div>
+        <div class="field">
+          <label>Description</label>
+          <textarea id="p-description" required placeholder="Fabric, fit, styling notes, care instructions..."></textarea>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>Price (₦)</label>
+            <input type="number" id="p-price" min="0" required />
+          </div>
+          <div class="field">
+            <label>Category</label>
+            <select id="p-category"></select>
+          </div>
+        </div>
+        <div class="field">
+          <label>Size guide (optional)</label>
+          <input type="text" id="p-size-guide" placeholder="e.g. S–XL, true to size" />
+        </div>
+        <div class="field">
+          <label><input type="checkbox" id="p-new-arrival" style="width:auto; margin-right:6px;" /> Mark as New Arrival</label>
+        </div>
+        <div class="field">
+          <label>Photos <span class="text-muted">(first = main photo, second = hover photo)</span></label>
+          <div class="file-drop" id="file-drop">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+            <div>Click to upload photos, or drag them here</div>
+          </div>
+          <input type="file" id="p-images" accept="image/*" multiple style="display:none;" />
+          <div class="image-preview-row" id="image-preview"></div>
+        </div>
+        <div class="field" id="admin-notes-field" style="display:none;">
+          <label>Private admin notes <span class="text-muted">(never shown to customers)</span></label>
+          <textarea id="p-admin-notes"></textarea>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" id="cancel-modal">Cancel</button>
+      <button class="btn btn-gold" id="save-product-btn">Save Product</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/api.js"></script>
+<script src="js/layout.js"></script>
+<script src="js/products.js"></script>
+</body>
+</html>

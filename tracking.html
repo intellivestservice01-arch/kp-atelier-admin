@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Deliveries — KP Atelier Admin</title>
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<div class="app-shell">
+  <div id="sidebar-root"></div>
+
+  <div class="main">
+    <div class="topbar">
+      <div>
+        <h1>Deliveries</h1>
+        <div class="topbar-sub">Every order with an active tracking ID</div>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Tracking ID</th><th>Order Ref</th><th>Customer</th><th>Status</th><th>Delivery Estimate</th><th></th></tr>
+          </thead>
+          <tbody id="deliveries-body">
+            <tr><td colspan="6" class="text-muted" style="padding:20px;">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="js/api.js"></script>
+<script src="js/layout.js"></script>
+<script>
+  const statusClass = { confirmed: "pill-gold", shipped: "pill-gold", delivered: "pill-success", cancelled: "pill-danger" };
+
+  (async () => {
+    await Layout.init("tracking");
+    const tbody = document.getElementById("deliveries-body");
+    try {
+      const data = await apiRequest("/orders/admin");
+      const withTracking = data.orders.filter(o => o.tracking_id);
+      if (!withTracking.length) {
+        tbody.innerHTML = `<tr><td colspan="6" class="text-muted" style="padding:20px;">No confirmed deliveries yet — confirm an order from the Orders page to generate a tracking ID.</td></tr>`;
+        return;
+      }
+      tbody.innerHTML = withTracking.map(o => `
+        <tr>
+          <td class="mono" style="color:var(--gold);">${escapeHtml(o.tracking_id)}</td>
+          <td class="mono">${escapeHtml(o.order_ref)}</td>
+          <td>${escapeHtml(o.customer_name || "—")}</td>
+          <td><span class="pill ${statusClass[o.status] || 'pill-muted'}"><span class="pill-dot"></span>${o.status.replace('_',' ')}</span></td>
+          <td>${escapeHtml(o.delivery_estimate || "—")}</td>
+          <td><a href="orders.html" class="btn btn-outline btn-sm">Manage</a></td>
+        </tr>
+      `).join("");
+    } catch (err) {
+      tbody.innerHTML = `<tr><td colspan="6" class="text-muted" style="padding:20px;">${escapeHtml(err.message)}</td></tr>`;
+    }
+  })();
+</script>
+</body>
+</html>

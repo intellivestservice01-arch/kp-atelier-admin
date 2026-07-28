@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Reviews — KP Atelier Admin</title>
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<div class="app-shell">
+  <div id="sidebar-root"></div>
+
+  <div class="main">
+    <div class="topbar">
+      <div>
+        <h1>Reviews</h1>
+        <div class="topbar-sub">Approve reviews before they show up on the site</div>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="field" style="max-width:220px;">
+        <select id="filter-review-status">
+          <option value="pending">Pending approval</option>
+          <option value="approved">Approved</option>
+          <option value="">All</option>
+        </select>
+      </div>
+
+      <div class="grid grid-2" id="reviews-grid">
+        <div class="text-muted" style="padding:20px;">Loading…</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="js/api.js"></script>
+<script src="js/layout.js"></script>
+<script>
+  const stars = (n) => "★".repeat(n) + "☆".repeat(5 - n);
+
+  async function loadReviews() {
+    const grid = document.getElementById("reviews-grid");
+    grid.innerHTML = `<div class="text-muted" style="padding:20px;">Loading…</div>`;
+
+    try {
+      const status = document.getElementById("filter-review-status").value;
+      const query = status ? `?status=${status}` : "";
+      const data = await apiRequest(`/reviews/admin${query}`);
+      renderReviews(data.reviews);
+    } catch (err) {
+      grid.innerHTML = `<div class="text-muted" style="padding:20px;">${escapeHtml(err.message)}</div>`;
+    }
+  }
+
+  function renderReviews(reviews) {
+    const grid = document.getElementById("reviews-grid");
+    if (!reviews.length) {
+      grid.innerHTML = `<div class="text-muted" style="padding:20px;">Nothing here.</div>`;
+      return;
+    }
+
+    grid.innerHTML = reviews.map((r) => `
+      <div class="card">
+        <div class="flex-between mb-16">
+          <div>
+            <strong>${escapeHtml(r.customer_name)}</strong>
+            <div style="color:var(--gold); font-size:15px; letter-spacing:1px;">${stars(r.rating)}</div>
+          </div>
+          ${r.is_approved
+            ? `<span class="pill pill-success"><span class="pill-dot"></span>Approved</span>`
+            : `<span class="pill pill-warning"><span class="pill-dot"></span>Pending</span>`}
+        </div>
+        <p style="font-size:13.5px; line-height:1.5; margin-bottom:12px;">${escapeHtml(r.body)}</p>
+        ${r.product_name ? `<div class="text-muted mb-16" style="font-size:12px;">On: ${escapeHtml(r.product_name)}</div>` : ""}
+        <div class="flex-between">
+          <span class="text-muted" style="font-size:11.5px;">${timeAgo(r.created_at)}</span>
+          <div class="flex gap-8">
+            ${!r.is_approved ? `<button class="btn btn-gold btn-sm" onclick="approveReview('${r.id}')">Approve</button>` : ""}
+            <button class="btn btn-danger btn-sm" onclick="deleteReview('${r.id}')">Delete</button>
+          </div>
+        </div>
+      </div>
+    `).join("");
+  }
+
+  async function approveReview(id) {
+    try {
+      await apiRequest(`/reviews/admin/${id}/approve`, { method: "PUT" });
+      toast("Review approved — now visible on the site");
+      loadReviews();
+    } catch (err) {
+      toast(err.message, true);
+    }
+  }
+
+  async function deleteReview(id) {
+    if (!confirm("Delete this review? This can't be undone.")) return;
+    try {
+      await apiRequest(`/reviews/admin/${id}`, { method: "DELETE" });
+      toast("Review deleted");
+      loadReviews();
+    } catch (err) {
+      toast(err.message, true);
+    }
+  }
+
+  (async () => {
+    await Layout.init("reviews");
+    await loadReviews();
+    document.getElementById("filter-review-status").addEventListener("change", loadReviews);
+  })();
+</script>
+</body>
+</html>

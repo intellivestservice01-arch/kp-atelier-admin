@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Orders — KP Atelier Admin</title>
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<div class="app-shell">
+  <div id="sidebar-root"></div>
+
+  <div class="main">
+    <div class="topbar">
+      <div>
+        <h1>Orders</h1>
+        <div class="topbar-sub">Inquiries, negotiations, and confirmed deliveries</div>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="field" style="max-width:240px;">
+        <select id="filter-status">
+          <option value="">All statuses</option>
+          <option value="inquiry">Inquiry</option>
+          <option value="negotiating">Negotiating</option>
+          <option value="payment_pending">Payment Pending</option>
+          <option value="confirmed">Confirmed</option>
+          <option value="shipped">Shipped</option>
+          <option value="delivered">Delivered</option>
+          <option value="cancelled">Cancelled</option>
+        </select>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Order Ref</th><th>Customer</th><th>Status</th>
+              <th>Final Price</th><th>Tracking ID</th><th>Placed</th><th></th>
+            </tr>
+          </thead>
+          <tbody id="orders-body">
+            <tr><td colspan="7" class="text-muted" style="padding:20px;">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Order detail modal -->
+<div class="modal-overlay hidden" id="order-modal">
+  <div class="modal" style="max-width:640px;">
+    <div class="modal-header">
+      <h2 id="order-modal-title">Order</h2>
+      <button class="modal-close" id="close-order-modal">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div id="order-detail-content">Loading…</div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" id="cancel-order-modal">Close</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/api.js"></script>
+<script src="js/layout.js"></script>
+<script src="js/orders.js"></script>
+</body>
+</html>

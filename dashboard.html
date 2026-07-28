@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Dashboard — KP Atelier Admin</title>
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<div class="app-shell">
+  <div id="sidebar-root"></div>
+
+  <div class="main">
+    <div class="topbar">
+      <div>
+        <h1>Dashboard</h1>
+        <div class="topbar-sub" id="welcome-text">Welcome back</div>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="grid grid-4" id="stat-tiles">
+        <div class="stat-tile"><div class="label">Pending Chats</div><div class="value" id="stat-chats">—</div></div>
+        <div class="stat-tile"><div class="label">Inquiries</div><div class="value" id="stat-inquiry">—</div></div>
+        <div class="stat-tile"><div class="label">Confirmed Orders</div><div class="value" id="stat-confirmed">—</div></div>
+        <div class="stat-tile"><div class="label">Delivered</div><div class="value" id="stat-delivered">—</div></div>
+      </div>
+
+      <div class="section-title">Best Sellers</div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Product</th><th>Units Sold</th></tr></thead>
+          <tbody id="bestsellers-body">
+            <tr><td colspan="2" class="text-muted" style="padding:20px;">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="section-title">Orders by Status</div>
+      <div class="grid grid-3" id="status-breakdown"></div>
+
+      <div class="section-title">Quick Actions</div>
+      <div class="flex gap-12">
+        <a href="products.html" class="btn btn-gold">+ Add New Product</a>
+        <a href="chat.html" class="btn btn-outline">Open Chat Inbox</a>
+        <a href="orders.html" class="btn btn-outline">View Orders</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="js/api.js"></script>
+<script src="js/layout.js"></script>
+<script>
+  (async () => {
+    await Layout.init("dashboard");
+
+    const admin = Auth.getAdmin();
+    document.getElementById("welcome-text").textContent = admin ? `Welcome back, ${admin.name}` : "Welcome back";
+
+    try {
+      const stats = await apiRequest("/admin/dashboard");
+
+      document.getElementById("stat-chats").textContent = stats.pendingChats ?? 0;
+
+      const byStatus = {};
+      (stats.ordersByStatus || []).forEach((s) => { byStatus[s.status] = s.count; });
+
+      document.getElementById("stat-inquiry").textContent = byStatus.inquiry || 0;
+      document.getElementById("stat-confirmed").textContent = byStatus.confirmed || 0;
+      document.getElementById("stat-delivered").textContent = byStatus.delivered || 0;
+
+      const statusColors = {
+        inquiry: "pill-muted", negotiating: "pill-warning", payment_pending: "pill-warning",
+        confirmed: "pill-gold", shipped: "pill-gold", delivered: "pill-success", cancelled: "pill-danger",
+      };
+
+      const breakdownEl = document.getElementById("status-breakdown");
+      if (!stats.ordersByStatus || !stats.ordersByStatus.length) {
+        breakdownEl.innerHTML = `<div class="text-muted">No orders yet.</div>`;
+      } else {
+        breakdownEl.innerHTML = stats.ordersByStatus.map(s => `
+          <div class="card flex-between">
+            <span class="pill ${statusColors[s.status] || 'pill-muted'}"><span class="pill-dot"></span>${s.status.replace('_',' ')}</span>
+            <strong>${s.count}</strong>
+          </div>
+        `).join("");
+      }
+
+      const bestBody = document.getElementById("bestsellers-body");
+      if (!stats.bestSellers || !stats.bestSellers.length) {
+        bestBody.innerHTML = `<tr><td colspan="2" class="text-muted" style="padding:20px;">No sales yet — best sellers will appear here.</td></tr>`;
+      } else {
+        bestBody.innerHTML = stats.bestSellers.map(p => `
+          <tr><td>${escapeHtml(p.name)}</td><td>${p.total_sold}</td></tr>
+        `).join("");
+      }
+    } catch (err) {
+      toast(err.message, true);
+    }
+  })();
+</script>
+</body>
+</html>

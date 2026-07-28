@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Videos — KP Atelier Admin</title>
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<div class="app-shell">
+  <div id="sidebar-root"></div>
+
+  <div class="main">
+    <div class="topbar">
+      <div>
+        <h1>Videos</h1>
+        <div class="topbar-sub">Paste a link or upload a file — shows up on the site automatically</div>
+      </div>
+      <button class="btn btn-gold" id="new-video-btn">+ Add Video</button>
+    </div>
+
+    <div class="content">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Preview</th><th>Title</th><th>Type</th><th>Placement</th>
+              <th>Order</th><th>Status</th><th></th>
+            </tr>
+          </thead>
+          <tbody id="videos-body">
+            <tr><td colspan="7" class="text-muted" style="padding:20px;">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add / Edit modal -->
+<div class="modal-overlay hidden" id="video-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="video-modal-title">Add Video</h2>
+      <button class="modal-close" id="close-video-modal">&times;</button>
+    </div>
+    <div class="modal-body">
+      <form id="video-form">
+        <input type="hidden" id="v-id" />
+
+        <div class="field">
+          <label>Title (optional)</label>
+          <input type="text" id="v-title" placeholder="e.g. Summer Collection Reel" />
+        </div>
+
+        <div class="field">
+          <label>Source</label>
+          <div class="flex gap-12 mb-16">
+            <label><input type="radio" name="v-source" value="link" checked style="width:auto; margin-right:6px;" /> Paste a link</label>
+            <label><input type="radio" name="v-source" value="file" style="width:auto; margin-right:6px;" /> Upload a file</label>
+          </div>
+        </div>
+
+        <div class="field" id="link-field">
+          <label>Video link</label>
+          <input type="text" id="v-link" placeholder="YouTube, Instagram, TikTok, or direct video URL" />
+          <div class="field-hint">Auto-detected — just paste any of these link types.</div>
+        </div>
+
+        <div class="field" id="file-field" style="display:none;">
+          <label>Video file <span class="text-muted">(max 45MB)</span></label>
+          <div class="file-drop" id="video-file-drop">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+            <div id="video-file-label">Click to upload a video, or drag it here</div>
+          </div>
+          <input type="file" id="v-file" accept="video/mp4,video/webm,video/quicktime,video/x-matroska" style="display:none;" />
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label>Placement</label>
+            <select id="v-placement">
+              <option value="hero">Hero (homepage banner)</option>
+              <option value="gallery">Gallery (further down the page)</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Sort order</label>
+            <input type="number" id="v-sort-order" value="0" min="0" />
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" id="cancel-video-modal">Cancel</button>
+      <button class="btn btn-gold" id="save-video-btn">Save Video</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/api.js"></script>
+<script src="js/layout.js"></script>
+<script src="js/videos.js"></script>
+</body>
+</html>
